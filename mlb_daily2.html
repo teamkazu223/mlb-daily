@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MLB Gameday Monitor</title>
+    <title>MLB Monitor</title>
     
-    <!-- iOS 獨立 App 模式核心標籤 -->
+    <!-- iOS 獨立 App 核心配置 (關鍵：順序需在最前) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MLB Monitor">
     <meta name="mobile-web-app-capable" content="yes">
     
-    <!-- iOS 圖示設定 -->
+    <!-- 圖示與 Manifest -->
     <link rel="apple-touch-icon" href="https://teamkazu223.github.io/mlb-daily/img/mlb.png">
-    <link rel="icon" type="image/png" href="https://teamkazu223.github.io/mlb-daily/img/mlb.png">
-
-    <!-- Web App Manifest (Data URI 內嵌) -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"MLB Gameday Monitor","short_name":"MLB Monitor","start_url":"index.html","scope":".","display":"standalone","background_color":"#0a1118","theme_color":"#0a1118","icons":[{"src":"https://teamkazu223.github.io/mlb-daily/img/mlb.png","sizes":"192x192","type":"image/png"},{"src":"https://teamkazu223.github.io/mlb-daily/img/mlb.png","sizes":"512x512","type":"image/png"}]}'>
+    <link rel="manifest" href='data:application/manifest+json,{"name":"MLB Monitor","short_name":"MLB Monitor","start_url":"./","scope":".","display":"standalone","background_color":"#0a1118","theme_color":"#0a1118","icons":[{"src":"https://teamkazu223.github.io/mlb-daily/img/mlb.png","sizes":"192x192","type":"image/png"}]}'>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -24,46 +21,53 @@
     <style>
         :root {
             --bg-color: #0a1118;
-            --tab-height: 70px;
+            --tab-height: 60px;
             --safe-bottom: env(safe-area-inset-bottom);
             --safe-top: env(safe-area-inset-top);
         }
         
-        html { background-color: var(--bg-color); -webkit-text-size-adjust: 100%; }
+        html { background-color: var(--bg-color); -webkit-text-size-adjust: 100%; height: 100%; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0; padding: 0; background-color: var(--bg-color); color: #ffffff;
-            padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + 30px);
+            /* 增加底部間距確保不被貼齊的頁籤擋住 */
+            padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + 40px);
             min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
         }
 
-        /* 頂部 Header：不常駐，隨滾動消失 */
+        /* 版本號標記 */
+        .version-tag {
+            position: absolute; top: calc(var(--safe-top) + 10px); left: 15px;
+            font-size: 8px; font-weight: 900; color: rgba(255,255,255,0.2);
+            letter-spacing: 0.1em; pointer-events: none; z-index: 100;
+        }
+
+        /* 頂部 Header：不常駐，適配瀏海 */
         header {
             background: linear-gradient(180deg, #141f2a 0%, #0a1118 100%);
             padding-top: calc(2.5rem + var(--safe-top));
-            padding-left: 1rem; padding-right: 1rem; padding-bottom: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: center;
+            padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* 底部頁籤：Safari 常駐優化 (向上浮動 15px 避開觸控死角) */
+        /* 底部頁籤：完全貼齊底部並適配 Safe Area */
         .tab-bar {
-            position: fixed; bottom: 15px; left: 15px; right: 15px;
-            height: var(--tab-height);
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: calc(var(--tab-height) + var(--safe-bottom));
             background: rgba(26, 38, 52, 0.98); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid #2d3d4d; border-radius: 20px;
-            display: flex; justify-content: space-around; padding-top: 12px;
-            z-index: 100000; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            -webkit-transform: translateZ(0); transform: translateZ(0);
+            border-top: 1px solid #2d3d4d;
+            display: flex; justify-content: space-around;
+            padding-top: 10px; padding-bottom: var(--safe-bottom);
+            z-index: 99999; transform: translateZ(0);
         }
 
         .tab-item {
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            color: #64748b; background: none; border: none; width: 45%; outline: none; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            color: #64748b; background: none; border: none; width: 45%; outline: none;
         }
         .tab-item.active { color: #3b82f6; }
-        .tab-item i { font-size: 22px; }
-        .tab-item span { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; }
+        .tab-item i { font-size: 20px; }
+        .tab-item span { font-size: 10px; font-weight: 900; text-transform: uppercase; }
 
         .card-dark {
             background-color: #1a2634; border: 1px solid #2d3d4d; border-radius: 1.5rem;
@@ -106,11 +110,13 @@
         .standing-table td { padding: 10px 4px; border-bottom: 1px solid #1e293b; }
         .division-header { background: rgba(59, 130, 246, 0.15); color: #3b82f6; font-weight: 900; padding: 10px 14px; border-radius: 8px; margin: 20px 0 10px 0; font-size: 11px; }
 
-        .bottom-spacer { height: 160px; width: 100%; }
+        .bottom-spacer { height: 120px; width: 100%; }
         main { padding: 0 1rem; }
     </style>
 </head>
 <body>
+
+    <div class="version-tag">v1.1</div>
 
     <div id="loader-overlay">
         <div class="baseball-spinner"></div>
@@ -123,7 +129,7 @@
         </div>
         <div id="header-controls" class="space-y-3 text-left">
             <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-black ml-1">EASTERN TIME (ET)</p>
-            <div class="flex gap-2">
+            <div class="flex gap-2 px-2">
                 <input type="date" id="target-date" class="flex-1 bg-[#1a2634] border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:ring-2 focus:ring-blue-500/50 shadow-inner" onchange="handleDateChange()">
                 <button onclick="handleManualRefresh()" class="w-16 bg-[#1a2634] border border-white/10 rounded-2xl flex items-center justify-center active:scale-90 shadow-inner">
                     <i class="fas fa-sync-alt text-lg text-blue-400"></i>
@@ -179,8 +185,8 @@
                 </h2>
                 <div class="card-dark overflow-hidden">
                     <div class="flex gap-2 mb-4">
-                        <button onclick="renderLeagueStandings('103')" id="btn-al" class="flex-1 py-2 rounded-xl bg-blue-600/20 text-blue-400 text-[10px] font-black tracking-widest border border-blue-500/30">AMERICAN LEAGUE</button>
-                        <button onclick="renderLeagueStandings('104')" id="btn-nl" class="flex-1 py-2 rounded-xl bg-slate-800 text-slate-500 text-[10px] font-black tracking-widest border border-transparent">NATIONAL LEAGUE</button>
+                        <button onclick="renderLeagueStandings('103')" id="btn-al" class="flex-1 py-2 rounded-xl bg-blue-600/20 text-blue-400 text-[10px] font-black border border-blue-500/30">AMERICAN LEAGUE</button>
+                        <button onclick="renderLeagueStandings('104')" id="btn-nl" class="flex-1 py-2 rounded-xl bg-slate-800 text-slate-500 text-[10px] font-black border border-transparent">NATIONAL LEAGUE</button>
                     </div>
                     <div id="standings-container"></div>
                 </div>
@@ -224,7 +230,7 @@
             document.getElementById('target-date').value = today;
             fetchDailyData();
             
-            // PWA 模式下防止外部跳轉 Safari
+            // 防止 iOS 點擊 a 標籤跳出 App 模式
             if (("standalone" in window.navigator) && window.navigator.standalone) {
                 const noddy = document.getElementsByTagName("a");
                 for (let i = 0; noddy.length > i; i++) {
