@@ -10,7 +10,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MLB Monitor">
     
-    <!-- 指定 iOS 圖示位置 -->
     <link rel="apple-touch-icon" href="https://teamkazu223.github.io/mlb-daily/img/mlb.png">
     <link rel="icon" type="image/png" href="https://teamkazu223.github.io/mlb-daily/img/mlb.png">
 
@@ -38,15 +37,17 @@
             padding: 0;
             background-color: var(--bg-color);
             color: #ffffff;
-            /* 預留空間給底部 Tab Bar */
+            /* 預留空間給底部 Tab Bar 並考慮 iOS 安全區 */
             padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + 20px);
             min-height: 100vh;
             overflow-x: hidden;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         header {
             background: linear-gradient(180deg, #141f2a 0%, #0a1118 100%);
-            /* 針對全螢幕模式調整頂部 Padding，防止狀態列遮擋 */
+            /* 針對 Standalone 模式調整頂部 Padding，防止狀態列遮擋 */
             padding: calc(2.5rem + var(--safe-top)) 1rem 1.5rem 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
@@ -64,7 +65,7 @@
             border-top: 1px solid #2d3d4d;
             display: flex;
             justify-content: space-around;
-            padding-top: 10px;
+            padding-top: 12px;
             padding-bottom: var(--safe-bottom);
             z-index: 100000;
             box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
@@ -72,24 +73,18 @@
             transform: translateZ(0);
         }
 
-        /* 當偵測到是從主畫面啟動時的樣式微調 */
-        @media (display-mode: standalone) {
-            .tab-bar {
-                background: rgba(10, 17, 24, 0.98);
-            }
-        }
-
         .tab-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
             color: #64748b;
             background: none;
             border: none;
             width: 45%;
             outline: none;
             -webkit-tap-highlight-color: transparent;
+            cursor: pointer;
         }
         .tab-item.active { color: #3b82f6; }
         .tab-item i { font-size: 22px; }
@@ -178,7 +173,6 @@
     </header>
 
     <main>
-        <!-- 今日分頁 -->
         <div id="tab-content-daily" class="tab-content">
             <section class="mt-6 mb-8">
                 <h2 class="font-black text-lg tracking-tight uppercase flex items-center mb-4">
@@ -206,7 +200,6 @@
             <div class="bottom-spacer"></div>
         </div>
 
-        <!-- 賽季分頁 -->
         <div id="tab-content-season" class="tab-content hidden">
             <section class="mt-6 mb-8">
                 <h2 class="font-black text-lg tracking-tight uppercase flex items-center mb-4 text-blue-400">
