@@ -2,7 +2,6 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <!-- 針對 iOS PWA 優化 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MLB Gameday Monitor</title>
     
@@ -10,12 +9,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MLB Monitor">
     <meta name="theme-color" content="#0a1118">
-    
-    <!-- 圖示設定 -->
     <link rel="apple-touch-icon" href="https://teamkazu223.github.io/mlb-daily/img/mlb.png">
     <link rel="icon" type="image/png" href="https://teamkazu223.github.io/mlb-daily/img/mlb.png">
-
-    <!-- Web App Manifest -->
     <link rel="manifest" href='data:application/manifest+json,{"name":"MLB Gameday Monitor","short_name":"MLB Monitor","start_url":".","display":"standalone","background_color":"#0a1118","theme_color":"#0a1118","icons":[{"src":"https://teamkazu223.github.io/mlb-daily/img/mlb.png","sizes":"192x192","type":"image/png"}]}'>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -33,38 +28,25 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0; padding: 0;
-            background-color: var(--bg-color); color: #ffffff;
-            /* 預留空間給常駐頁籤 */
-            padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + 30px);
-            min-height: 100vh;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
+            margin: 0; padding: 0; background-color: var(--bg-color); color: #ffffff;
+            padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + 20px);
+            min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
         }
 
-        /* 頂部 Header：不常駐 */
         header {
             background: linear-gradient(180deg, #141f2a 0%, #0a1118 100%);
             padding-top: calc(2.5rem + var(--safe-top));
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
+            padding-left: 1rem; padding-right: 1rem; padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); text-align: center;
         }
 
-        /* 底部頁籤：Safari 常駐強化 */
         .tab-bar {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
+            position: fixed; bottom: 0; left: 0; right: 0;
             height: calc(var(--tab-height) + var(--safe-bottom));
-            background: rgba(20, 31, 42, 0.98);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-top: 1px solid #2d3d4d;
-            display: flex; justify-content: space-around;
-            padding-top: 10px;
-            z-index: 10000;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
-            transform: translateZ(0);
+            background: rgba(26, 38, 52, 0.98); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-top: 1px solid #2d3d4d; display: flex; justify-content: space-around;
+            padding-top: 12px; padding-bottom: var(--safe-bottom); z-index: 100000;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.8); -webkit-transform: translateZ(0); transform: translateZ(0);
         }
 
         .tab-item {
@@ -75,52 +57,49 @@
         .tab-item i { font-size: 22px; }
         .tab-item span { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; }
 
-        /* 卡片與數據格線 */
-        .card-dark { background-color: #1a2634; border: 1px solid #2d3d4d; border-radius: 1.5rem; padding: 1.25rem; margin-bottom: 1.25rem; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+        .card-dark {
+            background-color: #1a2634; border: 1px solid #2d3d4d; border-radius: 1.5rem;
+            padding: 1.25rem; margin-bottom: 1rem; box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
         .stat-grid { display: grid; grid-template-columns: repeat(6, 1fr); text-align: center; padding-top: 12px; border-top: 1px solid #2d3d4d; }
         .season-stat-grid { display: grid; grid-template-columns: repeat(5, 1fr); text-align: center; padding-top: 12px; border-top: 1px solid #2d3d4d; }
         
         .live-dot { width: 6px; height: 6px; background-color: #ef4444; border-radius: 50%; display: inline-block; margin-right: 4px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         
         .schedule-row {
             display: flex; align-items: center; justify-content: space-between;
             padding: 12px; border-radius: 12px; background: rgba(26, 38, 52, 0.7);
-            border: 1px solid #2d3d4d; margin-bottom: 10px;
+            border: 1px solid #2d3d4d; margin-bottom: 8px;
         }
 
-        /* 藍色縮小版 Loading 動畫 */
         #loader-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--bg-color);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #0a1118; display: flex; flex-direction: column; align-items: center; justify-content: center;
             z-index: 1000000;
-            transition: opacity 0.4s ease;
         }
         .baseball-spinner {
             width: 50px; height: 50px; background-color: #3b82f6; border-radius: 50%;
             position: relative; animation: spin 2s linear infinite;
         }
         .baseball-spinner::before, .baseball-spinner::after {
-            content: ''; position: absolute; width: 40px; height: 40px; border: 3.5px solid var(--bg-color); border-radius: 50%;
+            content: ''; position: absolute; width: 40px; height: 40px; border: 3.5px solid #0a1118; border-radius: 50%;
         }
         .baseball-spinner::before { top: -24px; left: 5px; }
         .baseball-spinner::after { bottom: -24px; right: -10px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loader-text { color: #81b3ff; font-weight: 900; font-size: 13px; letter-spacing: 0.3em; margin-top: 24px; text-transform: uppercase; }
+        .loader-text { color: #81b3ff; font-weight: 900; font-size: 13px; letter-spacing: 0.25em; margin-top: 20px; text-transform: uppercase; }
 
-        .starter-badge { background-color: rgba(79, 70, 229, 0.2); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3); padding: 2px 8px; border-radius: 6px; font-size: 9px; }
-        .played-badge { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); padding: 2px 8px; border-radius: 6px; font-size: 9px; }
-
-        .standing-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 10px; }
-        .standing-table th { text-align: left; color: #64748b; font-weight: 800; padding: 12px 4px; border-bottom: 1px solid #2d3d4d; text-transform: uppercase; }
+        .standing-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 20px; }
+        .standing-table th { text-align: left; color: #64748b; font-weight: 800; padding: 10px 4px; border-bottom: 1px solid #2d3d4d; }
         .standing-table td { padding: 10px 4px; border-bottom: 1px solid #1e293b; }
-        .division-header { background: rgba(59, 130, 246, 0.15); color: #3b82f6; font-weight: 900; padding: 10px 14px; border-radius: 8px; margin: 20px 0 10px 0; font-size: 11px; letter-spacing: 1px; }
+        .division-header { background: rgba(59, 130, 246, 0.15); color: #3b82f6; font-weight: 900; padding: 10px 14px; border-radius: 8px; margin: 20px 0 10px 0; font-size: 11px; }
 
-        .bottom-spacer { height: 100px; width: 100%; }
+        .played-badge { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); padding: 2px 8px; border-radius: 6px; font-size: 9px; }
+        .starter-badge { background-color: rgba(79, 70, 229, 0.2); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3); padding: 2px 8px; border-radius: 6px; font-size: 9px; }
         
-        main { padding: 0 1.25rem; }
+        .bottom-spacer { height: 100px; width: 100%; }
+        main { padding: 0 1rem; }
     </style>
 </head>
 <body>
@@ -131,45 +110,45 @@
     </div>
 
     <header>
-        <div class="flex justify-center mb-8">
-            <img src="https://www.mlbstatic.com/team-logos/league-on-dark/1.svg" class="h-14" alt="MLB">
+        <div class="flex justify-center mb-6">
+            <img src="https://www.mlbstatic.com/team-logos/league-on-dark/1.svg" class="h-12" alt="MLB">
         </div>
         <div id="header-controls" class="space-y-3 text-left">
-            <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-black ml-1 px-1">EASTERN TIME (ET)</p>
-            <div class="flex gap-2 px-1">
+            <p class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-black ml-1">EASTERN TIME (ET)</p>
+            <div class="flex gap-2">
                 <input type="date" id="target-date" class="flex-1 bg-[#1a2634] border border-white/10 rounded-2xl p-4 text-white font-bold outline-none focus:ring-2 focus:ring-blue-500/50 shadow-inner" onchange="handleDateChange()">
-                <button onclick="handleManualRefresh()" class="w-16 bg-[#1a2634] border border-white/10 rounded-2xl flex items-center justify-center active:scale-90 transition-all shadow-inner">
+                <button onclick="handleManualRefresh()" class="w-16 bg-[#1a2634] border border-white/10 rounded-2xl flex items-center justify-center active:scale-90 shadow-inner">
                     <i class="fas fa-sync-alt text-lg text-blue-400"></i>
                 </button>
             </div>
         </div>
         <div id="header-season-title" class="hidden py-4">
-            <h1 class="text-2xl font-black italic tracking-tighter uppercase text-blue-400">Season Overview 2026</h1>
+            <h1 class="text-2xl font-black italic tracking-tighter uppercase text-blue-400">Season Stats 2026</h1>
         </div>
     </header>
 
     <main>
         <div id="tab-content-daily" class="tab-content">
-            <section class="mt-8 mb-10">
-                <h2 class="font-black text-lg tracking-tight uppercase flex items-center mb-5">
+            <section class="mt-6 mb-8">
+                <h2 class="font-black text-lg tracking-tight uppercase flex items-center mb-4">
                     <span class="w-1 h-5 bg-blue-500 mr-2 rounded-full"></span>
                     Schedule <span class="text-xs text-slate-500 ml-2 font-medium">重點賽程</span>
                 </h2>
                 <div id="schedule-list" class="space-y-2"></div>
             </section>
 
-            <section class="mb-10">
-                <h2 class="font-black text-lg tracking-tight uppercase flex items-center mb-5">
+            <section class="mb-8">
+                <h2 class="font-black text-lg tracking-tight uppercase flex items-center mb-4">
                     <span class="w-1 h-5 bg-orange-500 mr-2 rounded-full"></span>
-                    Batters <span class="text-xs text-slate-500 ml-2 font-medium">今日單場成績</span>
+                    Batters <span class="text-xs text-slate-500 ml-2 font-medium">單場成績</span>
                 </h2>
                 <div id="batter-list" class="space-y-4"></div>
             </section>
 
-            <section class="mb-10">
-                <h2 class="font-black text-lg tracking-tight uppercase flex items-center mb-5">
+            <section class="mb-8">
+                <h2 class="font-black text-lg tracking-tight uppercase flex items-center mb-4">
                     <span class="w-1 h-5 bg-emerald-500 mr-2 rounded-full"></span>
-                    Pitchers <span class="text-xs text-slate-500 ml-2 font-medium">今日單場成績</span>
+                    Pitchers <span class="text-xs text-slate-500 ml-2 font-medium">單場成績</span>
                 </h2>
                 <div id="pitcher-list" class="space-y-4"></div>
             </section>
@@ -177,23 +156,23 @@
         </div>
 
         <div id="tab-content-season" class="tab-content hidden">
-            <section class="mt-8 mb-10">
-                <h2 class="font-black text-lg tracking-tight uppercase flex items-center mb-5 text-blue-400">
+            <section class="mt-6 mb-8">
+                <h2 class="font-black text-lg tracking-tight uppercase flex items-center mb-4 text-blue-400">
                     <span class="w-1 h-5 bg-blue-400 mr-2 rounded-full"></span>
                     Accumulated <span class="text-xs text-slate-500 ml-2 font-medium">2026 賽季累積</span>
                 </h2>
                 <div id="season-stats-list" class="space-y-4"></div>
             </section>
 
-            <section class="mb-10">
-                <h2 class="font-black text-lg tracking-tight uppercase flex items-center mb-5 text-slate-300">
+            <section class="mb-8">
+                <h2 class="font-black text-lg tracking-tight uppercase flex items-center mb-4 text-slate-300">
                     <span class="w-1 h-5 bg-slate-500 mr-2 rounded-full"></span>
                     Standings <span class="text-xs text-slate-500 ml-2 font-medium">分區排名</span>
                 </h2>
                 <div class="card-dark overflow-hidden">
-                    <div class="flex gap-2 mb-5">
-                        <button onclick="renderLeagueStandings('103')" id="btn-al" class="flex-1 py-2.5 rounded-xl bg-blue-600/20 text-blue-400 text-[10px] font-black tracking-widest border border-blue-500/30">AMERICAN LEAGUE</button>
-                        <button onclick="renderLeagueStandings('104')" id="btn-nl" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-500 text-[10px] font-black">NATIONAL LEAGUE</button>
+                    <div class="flex gap-2 mb-4">
+                        <button onclick="renderLeagueStandings('103')" id="btn-al" class="flex-1 py-2 rounded-xl bg-blue-600/20 text-blue-400 text-[10px] font-black tracking-widest border border-blue-500/30">AMERICAN LEAGUE</button>
+                        <button onclick="renderLeagueStandings('104')" id="btn-nl" class="flex-1 py-2 rounded-xl bg-slate-800 text-slate-500 text-[10px] font-black tracking-widest border border-transparent">NATIONAL LEAGUE</button>
                     </div>
                     <div id="standings-container"></div>
                 </div>
@@ -232,22 +211,62 @@
         let dailyGames = []; let probablePitchers = new Set(); let currentTab = 'daily'; let seasonDataLoaded = false; let standingsData = null;
 
         function init() {
-            const today = new Date().toISOString().split('T')[0];
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
             document.getElementById('target-date').value = today;
             fetchDailyData();
+        }
+
+        async function switchTab(tabName) {
+            if (currentTab === tabName) return;
+            currentTab = tabName;
+            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${tabName}`).classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-content-${tabName}`).classList.remove('hidden');
+
+            if (tabName === 'daily') {
+                document.getElementById('header-controls').classList.remove('hidden');
+                document.getElementById('header-season-title').classList.add('hidden');
+            } else {
+                document.getElementById('header-controls').classList.add('hidden');
+                document.getElementById('header-season-title').classList.remove('hidden');
+                if (!seasonDataLoaded) await fetchSeasonData();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleLoader(show) {
+            const loader = document.getElementById('loader-overlay');
+            if (show) { loader.style.display = 'flex'; loader.style.opacity = '1'; }
+            else { loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 400); }
         }
 
         async function fetchDailyData() {
             toggleLoader(true);
             const date = document.getElementById('target-date').value;
             try {
-                // 平行抓取賽程，取得 gamePks
                 await fetchSchedule(date);
-                // 使用 gamePks 平行抓取所有重點選手數據
                 await fetchPlayerStats();
             } catch (e) { console.error(e); }
-            finally { setTimeout(() => toggleLoader(false), 500); }
+            finally { setTimeout(() => toggleLoader(false), 600); }
         }
+
+        async function fetchSeasonData() {
+            toggleLoader(true);
+            try {
+                await Promise.all([fetchSeasonOverview(), fetchStandings()]);
+                seasonDataLoaded = true;
+                renderLeagueStandings('103'); 
+            } catch (e) { console.error(e); }
+            finally { setTimeout(() => toggleLoader(false), 800); }
+        }
+
+        window.handleDateChange = () => { fetchDailyData(); };
+        window.handleManualRefresh = () => { 
+            if (currentTab === 'daily') fetchDailyData(); 
+            else fetchSeasonData(); 
+        };
 
         async function fetchSchedule(date) {
             try {
@@ -309,73 +328,58 @@
         async function fetchPlayerStats() {
             const bList = document.getElementById('batter-list');
             const pList = document.getElementById('pitcher-list');
-            
-            // 預先並行抓取所有涉及的 boxscores (緩存)
-            const boxscoreCache = {};
-            await Promise.all(dailyGames.map(async pk => {
-                try {
-                    const res = await fetch(`https://statsapi.mlb.com/api/v1/game/${pk}/boxscore`);
-                    boxscoreCache[pk] = await res.json();
-                } catch(e) {}
-            }));
-
             let bHtml = ''; let pHtml = '';
             for (const p of PLAYERS.batters) {
-                const result = getStatsFromCache(p.id, 'batting', boxscoreCache);
+                const result = await findAndGetPlayerStats(p.id, 'batting');
                 bHtml += renderBatterCard(p, result.stats, result.played);
             }
             for (const p of PLAYERS.pitchers) {
-                const result = getStatsFromCache(p.id, 'pitching', boxscoreCache);
+                const result = await findAndGetPlayerStats(p.id, 'pitching');
                 pHtml += renderPitcherCard(p, result.stats, result.played);
             }
             bList.innerHTML = bHtml; pList.innerHTML = pHtml;
         }
 
-        function getStatsFromCache(playerId, type, cache) {
+        async function findAndGetPlayerStats(playerId, type) {
             let combined = null; let played = false;
-            Object.values(cache).forEach(data => {
-                for (const side of ['away', 'home']) {
-                    const player = data.teams[side].players[`ID${playerId}`];
-                    if (player?.stats?.[type]) {
-                        const s = player.stats[type];
-                        const k = s.strikeOuts ?? s.strikeouts ?? 0;
-                        const hasIn = type === 'pitching' && s.inningsPitched && s.inningsPitched !== "0.0";
-                        const hasPi = type === 'pitching' && s.numberOfPitches > 0;
-                        const hasAB = type === 'batting' && (s.atBats > 0 || s.hits > 0 || s.baseOnBalls > 0);
-                        if (hasIn || hasPi || hasAB) {
-                            played = true;
-                            if (!combined) combined = { ...s, strikeOuts: k };
-                            else Object.keys(s).forEach(kKey => { 
-                                if(typeof s[kKey] === 'number') combined[kKey] = (combined[kKey] || 0) + s[kKey]; 
-                            });
+            for (const pk of dailyGames) {
+                try {
+                    const res = await fetch(`https://statsapi.mlb.com/api/v1/game/${pk}/boxscore`);
+                    const data = await res.json();
+                    for (const side of ['away', 'home']) {
+                        const player = data.teams[side].players[`ID${playerId}`];
+                        if (player && player.stats && player.stats[type]) {
+                            const s = player.stats[type];
+                            const k = s.strikeOuts ?? s.strikeouts ?? 0;
+                            const hasIn = type === 'pitching' && s.inningsPitched && s.inningsPitched !== "0.0";
+                            const hasPi = type === 'pitching' && s.numberOfPitches > 0;
+                            const hasAB = type === 'batting' && (s.atBats > 0 || s.hits > 0 || s.baseOnBalls > 0);
+                            if (hasIn || hasPi || hasAB) {
+                                played = true;
+                                if (!combined) combined = { ...s, strikeOuts: k };
+                                else Object.keys(s).forEach(kKey => { 
+                                    if(typeof s[kKey] === 'number') combined[kKey] = (combined[kKey] || 0) + s[kKey]; 
+                                });
+                            }
                         }
                     }
-                }
-            });
+                } catch (e) { }
+            }
             return { stats: combined, played };
-        }
-
-        async function fetchSeasonData() {
-            toggleLoader(true);
-            try {
-                await Promise.all([fetchSeasonOverview(), fetchStandings()]);
-                seasonDataLoaded = true;
-                renderLeagueStandings('103'); 
-            } catch (e) { console.error(e); }
-            finally { setTimeout(() => toggleLoader(false), 500); }
         }
 
         async function fetchSeasonOverview() {
             const list = document.getElementById('season-stats-list');
             const year = '2026';
-            
-            // 平行抓取所有球員的賽季累積成績
-            const batterStats = await Promise.all(PLAYERS.batters.map(p => getSeasonStats(p.id, year, 'hitting')));
-            const pitcherStats = await Promise.all(PLAYERS.pitchers.map(p => getSeasonStats(p.id, year, 'pitching')));
-            
             let html = '';
-            PLAYERS.batters.forEach((p, i) => html += renderSeasonCard(p, batterStats[i], 'hitting'));
-            PLAYERS.pitchers.forEach((p, i) => html += renderSeasonCard(p, pitcherStats[i], 'pitching'));
+            for (const p of PLAYERS.batters) {
+                const s = await getSeasonStats(p.id, year, 'hitting');
+                html += renderSeasonCard(p, s, 'hitting');
+            }
+            for (const p of PLAYERS.pitchers) {
+                const s = await getSeasonStats(p.id, year, 'pitching');
+                html += renderSeasonCard(p, s, 'pitching');
+            }
             list.innerHTML = html;
         }
 
@@ -387,40 +391,73 @@
             } catch (e) { return null; }
         }
 
-        async function switchTab(tabName) {
-            if (currentTab === tabName) return;
-            currentTab = tabName;
-            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`nav-${tabName}`).classList.add('active');
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-content-${tabName}`).classList.remove('hidden');
+        async function fetchStandings() {
+            try {
+                const res = await fetch(`https://statsapi.mlb.com/api/v1/standings?leagueId=103,104&season=2026&standingsTypes=regularSeason`);
+                const data = await res.json();
+                standingsData = data.records;
+            } catch (e) { console.error(e); }
+        }
 
-            if (tabName === 'daily') {
-                document.getElementById('header-controls').classList.remove('hidden');
-                document.getElementById('header-season-title').classList.add('hidden');
-            } else {
-                document.getElementById('header-controls').classList.add('hidden');
-                document.getElementById('header-season-title').classList.remove('hidden');
-                if (!seasonDataLoaded) await fetchSeasonData();
+        const getDivisionInfo = (divName, lId) => {
+            const safeName = divName || "";
+            const isEast = safeName.includes("East");
+            const isCentral = safeName.includes("Central");
+            const isWest = safeName.includes("West");
+            let displayName = safeName;
+            let sortOrder = 99;
+            if (lId == '103') { 
+                if (isEast) { displayName = "東區"; sortOrder = 1; }
+                else if (isCentral) { displayName = "中區"; sortOrder = 2; }
+                else if (isWest) { displayName = "西區"; sortOrder = 3; }
+            } else { 
+                if (isEast) { displayName = "East"; sortOrder = 1; }
+                else if (isCentral) { displayName = "Central"; sortOrder = 2; }
+                else if (isWest) { displayName = "West"; sortOrder = 3; }
             }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+            return { displayName, sortOrder };
+        };
 
-        function toggleLoader(show) {
-            const loader = document.getElementById('loader-overlay');
-            if (show) { loader.style.display = 'flex'; loader.style.opacity = '1'; }
-            else { loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 400); }
-        }
-
-        function handleDateChange() { fetchDailyData(); }
-        function handleManualRefresh() { 
-            if (currentTab === 'daily') fetchDailyData(); 
-            else fetchSeasonData(); 
-        }
+        window.renderLeagueStandings = (leagueId) => {
+            const container = document.getElementById('standings-container');
+            const btnAl = document.getElementById('btn-al');
+            const btnNl = document.getElementById('btn-nl');
+            if (leagueId === '103') {
+                btnAl.className = 'flex-1 py-2 rounded-xl bg-blue-600/20 text-blue-400 text-[10px] font-black tracking-widest border border-blue-500/30';
+                btnNl.className = 'flex-1 py-2 rounded-xl bg-slate-800 text-slate-500 text-[10px] font-black tracking-widest border border-transparent';
+            } else {
+                btnNl.className = 'flex-1 py-2 rounded-xl bg-blue-600/20 text-blue-400 text-[10px] font-black tracking-widest border border-blue-500/30';
+                btnAl.className = 'flex-1 py-2 rounded-xl bg-slate-800 text-slate-500 text-[10px] font-black tracking-widest border border-transparent';
+            }
+            if (!standingsData) return;
+            const leagueRecords = standingsData.filter(r => r.league && r.league.id == leagueId).map(r => ({ ...r, info: getDivisionInfo(r.division?.name, leagueId) })).sort((a, b) => a.info.sortOrder - b.info.sortOrder); 
+            let html = '';
+            leagueRecords.forEach(div => {
+                html += `<div class="division-header">${div.info.displayName}</div>`;
+                html += `<table class="standing-table">
+                    <thead><tr><th style="width: 10%">RK</th><th style="width: 50%">TEAM</th><th style="width: 20%; text-align: center">W-L</th><th style="width: 20%; text-align: center">PCT</th></tr></thead>
+                    <tbody>
+                        ${div.teamRecords.map((t, idx) => {
+                            const isPri = PRIORITY_TEAMS.includes(t.team.id);
+                            return `<tr class="${isPri ? 'bg-blue-500/5' : ''}">
+                                <td class="font-bold text-slate-500">${idx + 1}</td>
+                                <td class="flex items-center gap-2">
+                                    <img src="https://www.mlbstatic.com/team-logos/${t.team.id}.svg" class="w-4 h-4">
+                                    <span class="${isPri ? 'text-blue-400 font-black' : 'text-slate-300 font-bold'}">${TEAM_MAP[t.team.id] || t.team.name}</span>
+                                </td>
+                                <td style="text-align: center" class="font-bold text-slate-300">${t.wins ?? 0}-${t.losses ?? 0}</td>
+                                <td style="text-align: center" class="font-bold text-slate-400">${t.winningPercentage ?? '.000'}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>`;
+            });
+            container.innerHTML = html;
+        };
 
         function renderBatterCard(p, stat, played) {
             const d = { ab: stat?.atBats ?? 0, r: stat?.runs ?? 0, h: stat?.hits ?? 0, bb: stat?.baseOnBalls ?? 0, rbi: stat?.rbi ?? 0, hr: stat?.homeRuns ?? 0 };
-            return `<div class="card-dark rounded-3xl p-5 shadow-2xl relative overflow-hidden">
+            return `<div class="card-dark relative overflow-hidden">
                 <div class="flex items-center gap-4 mb-4">
                     <img src="${p.img}" class="w-16 h-16 rounded-full border-2 border-white/10 bg-[#0a1118] object-cover">
                     <div class="flex-1">
@@ -446,7 +483,7 @@
             const d = { ip: stat?.inningsPitched ?? '0.0', h: stat?.hits ?? 0, r: stat?.runs ?? 0, er: stat?.earnedRuns ?? 0, bb: stat?.baseOnBalls ?? 0, k: stat?.strikeOuts ?? stat?.strikeouts ?? 0 };
             let statusText = played ? '已登板' : (isProbable ? '先發投手' : '未登板');
             let statusClass = played ? 'played-badge' : (isProbable ? 'starter-badge' : 'bg-slate-800 text-slate-500');
-            return `<div class="card-dark rounded-3xl p-5 shadow-2xl relative overflow-hidden">
+            return `<div class="card-dark relative overflow-hidden">
                 <div class="flex items-center gap-4 mb-4">
                     <img src="${p.img}" class="w-16 h-16 rounded-full border-2 border-white/10 bg-[#0a1118] object-cover">
                     <div class="flex-1">
@@ -499,51 +536,6 @@
                 <div class="season-stat-grid">${statsHtml}</div>
             </div>`;
         }
-
-        async function fetchStandings() {
-            try {
-                const res = await fetch(`https://statsapi.mlb.com/api/v1/standings?leagueId=103,104&season=2026&standingsTypes=regularSeason`);
-                const data = await res.json();
-                standingsData = data.records;
-            } catch (e) { console.error(e); }
-        }
-
-        window.renderLeagueStandings = (leagueId) => {
-            const container = document.getElementById('standings-container');
-            const btnAl = document.getElementById('btn-al');
-            const btnNl = document.getElementById('btn-nl');
-            if (leagueId === '103') {
-                btnAl.className = 'flex-1 py-2 rounded-xl bg-blue-600/20 text-blue-400 text-[10px] font-black tracking-widest border border-blue-500/30';
-                btnNl.className = 'flex-1 py-2 rounded-xl bg-slate-800 text-slate-500 text-[10px] font-black tracking-widest border border-transparent';
-            } else {
-                btnNl.className = 'flex-1 py-2 rounded-xl bg-blue-600/20 text-blue-400 text-[10px] font-black tracking-widest border border-blue-500/30';
-                btnAl.className = 'flex-1 py-2 rounded-xl bg-slate-800 text-slate-500 text-[10px] font-black tracking-widest border border-transparent';
-            }
-            if (!standingsData) return;
-            const leagueRecords = standingsData.filter(r => r.league && r.league.id == leagueId).map(r => ({ ...r, info: getDivisionInfo(r.division?.name, leagueId) })).sort((a, b) => a.info.sortOrder - b.info.sortOrder); 
-            let html = '';
-            leagueRecords.forEach(div => {
-                html += `<div class="division-header">${div.info.displayName}</div>`;
-                html += `<table class="standing-table">
-                    <thead><tr><th style="width: 10%">RK</th><th style="width: 50%">TEAM</th><th style="width: 20%; text-align: center">W-L</th><th style="width: 20%; text-align: center">PCT</th></tr></thead>
-                    <tbody>
-                        ${div.teamRecords.map((t, idx) => {
-                            const isPri = PRIORITY_TEAMS.includes(t.team.id);
-                            return `<tr class="${isPri ? 'bg-blue-500/5' : ''}">
-                                <td class="font-bold text-slate-500">${idx + 1}</td>
-                                <td class="flex items-center gap-2">
-                                    <img src="https://www.mlbstatic.com/team-logos/${t.team.id}.svg" class="w-4 h-4">
-                                    <span class="${isPri ? 'text-blue-400 font-black' : 'text-slate-300 font-bold'}">${TEAM_MAP[t.team.id] || t.team.name}</span>
-                                </td>
-                                <td style="text-align: center" class="font-bold text-slate-300">${t.wins ?? 0}-${t.losses ?? 0}</td>
-                                <td style="text-align: center" class="font-bold text-slate-400">${t.winningPercentage ?? '.000'}</td>
-                            </tr>`;
-                        }).join('')}
-                    </tbody>
-                </table>`;
-            });
-            container.innerHTML = html;
-        };
 
         window.onload = init;
     </script>
