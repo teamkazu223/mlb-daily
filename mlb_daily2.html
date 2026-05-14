@@ -2,17 +2,22 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <!-- 加入 viewport-fit=cover 確保內容延伸至全螢幕邊緣 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MLB Gameday Monitor</title>
     
-    <!-- iOS PWA 核心標籤 -->
+    <!-- iOS PWA 核心配置：實現「去瀏覽器化」 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- 狀態列透明化，讓背景色延伸至頂部 -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MLB Monitor">
+    <meta name="theme-color" content="#0a1118">
     
+    <!-- iOS 圖示 -->
     <link rel="apple-touch-icon" href="https://teamkazu223.github.io/mlb-daily/img/mlb.png">
     <link rel="icon" type="image/png" href="https://teamkazu223.github.io/mlb-daily/img/mlb.png">
 
+    <!-- Web App Manifest (Data URI 內嵌) -->
     <link rel="manifest" href='data:application/manifest+json,{"name":"MLB Gameday Monitor","short_name":"MLB Monitor","start_url":".","display":"standalone","background_color":"#0a1118","theme_color":"#0a1118","icons":[{"src":"https://teamkazu223.github.io/mlb-daily/img/mlb.png","sizes":"192x192","type":"image/png"},{"src":"https://teamkazu223.github.io/mlb-daily/img/mlb.png","sizes":"512x512","type":"image/png"}]}'>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -37,22 +42,29 @@
             padding: 0;
             background-color: var(--bg-color);
             color: #ffffff;
-            /* 預留空間給底部 Tab Bar 並考慮 iOS 安全區 */
+            /* 預留空間給底部 Tab Bar，確保不被螢幕底部的 Home Indicator 擋住 */
             padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + 20px);
             min-height: 100vh;
             overflow-x: hidden;
+            /* 移除移動端點擊時產生的灰色背景，更像 App */
+            -webkit-tap-highlight-color: transparent;
             -webkit-user-select: none;
             user-select: none;
         }
 
+        /* 頂部 Header：適配全螢幕狀態列 */
         header {
             background: linear-gradient(180deg, #141f2a 0%, #0a1118 100%);
-            /* 針對 Standalone 模式調整頂部 Padding，防止狀態列遮擋 */
-            padding: calc(2.5rem + var(--safe-top)) 1rem 1.5rem 1rem;
+            /* 在 Standalone 模式下，自動增加頂部 Padding 以避開瀏海/動態島 */
+            padding-top: calc(2.5rem + var(--safe-top));
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-bottom: 1.5rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
         }
 
+        /* 底部導覽列：針對 iOS 17+ 常駐優化 */
         .tab-bar {
             position: fixed;
             bottom: 0;
@@ -69,6 +81,7 @@
             padding-bottom: var(--safe-bottom);
             z-index: 100000;
             box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+            /* 強制開啟硬體加速防止 Safari 捲動時頁籤消失 */
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
         }
@@ -83,7 +96,6 @@
             border: none;
             width: 45%;
             outline: none;
-            -webkit-tap-highlight-color: transparent;
             cursor: pointer;
         }
         .tab-item.active { color: #3b82f6; }
@@ -140,7 +152,7 @@
         .standing-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 20px; }
         .standing-table th { text-align: left; color: #64748b; font-weight: 800; padding: 10px 4px; border-bottom: 1px solid #2d3d4d; }
         .standing-table td { padding: 10px 4px; border-bottom: 1px solid #1e293b; }
-        .division-header { background: rgba(59, 130, 246, 0.15); color: #3b82f6; font-weight: 900; padding: 10px 14px; border-radius: 8px; margin: 15px 0 10px 0; font-size: 11px; }
+        .division-header { background: rgba(59, 130, 246, 0.15); color: #3b82f6; font-weight: 900; padding: 10px 14px; border-radius: 8px; margin: 20px 0 10px 0; font-size: 11px; }
 
         .bottom-spacer { height: 100px; width: 100%; }
         
@@ -149,6 +161,7 @@
 </head>
 <body>
 
+    <!-- 加載動畫 -->
     <div id="loader-overlay">
         <div class="baseball-spinner"></div>
         <p class="loader-text">SYNCHRONIZING DATA...</p>
@@ -173,6 +186,7 @@
     </header>
 
     <main>
+        <!-- 頁籤內容 1: 今日戰況 -->
         <div id="tab-content-daily" class="tab-content">
             <section class="mt-6 mb-8">
                 <h2 class="font-black text-lg tracking-tight uppercase flex items-center mb-4">
@@ -200,6 +214,7 @@
             <div class="bottom-spacer"></div>
         </div>
 
+        <!-- 頁籤內容 2: 賽季累積 -->
         <div id="tab-content-season" class="tab-content hidden">
             <section class="mt-6 mb-8">
                 <h2 class="font-black text-lg tracking-tight uppercase flex items-center mb-4 text-blue-400">
@@ -293,7 +308,7 @@
             try {
                 await fetchSchedule(date);
                 await fetchPlayerStats();
-            } catch (e) { }
+            } catch (e) { console.error(e); }
             finally { setTimeout(() => toggleLoader(false), 600); }
         }
 
@@ -303,10 +318,11 @@
                 await Promise.all([fetchSeasonOverview(), fetchStandings()]);
                 seasonDataLoaded = true;
                 renderLeagueStandings('103'); 
-            } catch (e) { }
+            } catch (e) { console.error(e); }
             finally { setTimeout(() => toggleLoader(false), 800); }
         }
 
+        // 全域暴露函數
         window.handleDateChange = () => { fetchDailyData(); };
         window.handleManualRefresh = () => { 
             if (currentTab === 'daily') fetchDailyData(); 
@@ -367,7 +383,7 @@
                         </div>
                     </div>`;
                 }).join('');
-            } catch (e) { }
+            } catch (e) { console.error(e); }
         }
 
         async function fetchPlayerStats() {
@@ -395,13 +411,17 @@
                         const player = data.teams[side].players[`ID${playerId}`];
                         if (player && player.stats && player.stats[type]) {
                             const s = player.stats[type];
+                            // 嚴格出賽判定：修正三振欄位名稱 strikeOuts
+                            const k = s.strikeOuts ?? s.strikeouts ?? 0;
                             const hasIn = type === 'pitching' && s.inningsPitched && s.inningsPitched !== "0.0";
                             const hasPi = type === 'pitching' && s.numberOfPitches > 0;
                             const hasAB = type === 'batting' && (s.atBats > 0 || s.hits > 0 || s.baseOnBalls > 0);
                             if (hasIn || hasPi || hasAB) {
                                 played = true;
-                                if (!combined) combined = { ...s };
-                                else Object.keys(s).forEach(k => { if(typeof s[k] === 'number') combined[k] = (combined[k] || 0) + s[k]; });
+                                if (!combined) combined = { ...s, strikeOuts: k };
+                                else Object.keys(s).forEach(kKey => { 
+                                    if(typeof s[kKey] === 'number') combined[kKey] = (combined[kKey] || 0) + s[kKey]; 
+                                });
                             }
                         }
                     }
@@ -438,7 +458,7 @@
                 const res = await fetch(`https://statsapi.mlb.com/api/v1/standings?leagueId=103,104&season=2026&standingsTypes=regularSeason`);
                 const data = await res.json();
                 standingsData = data.records;
-            } catch (e) { }
+            } catch (e) { console.error(e); }
         }
 
         const getDivisionInfo = (divName, lId) => {
@@ -515,7 +535,7 @@
                     <div class="flex flex-col"><span class="text-[9px] text-slate-500 uppercase font-bold">H</span><span class="text-sm font-black ${d.h > 0 ? 'text-blue-400' : ''}">${d.h}</span></div>
                     <div class="flex flex-col"><span class="text-[9px] text-slate-400 uppercase font-bold">BB</span><span class="text-sm font-black">${d.bb}</span></div>
                     <div class="flex flex-col"><span class="text-[9px] text-slate-500 uppercase font-bold">RBI</span><span class="text-sm font-black">${d.rbi}</span></div>
-                    <div class="flex flex-col"><span class="text-[9px] text-slate-500 uppercase font-bold">HR</span><span class="text-sm font-black ${d.hr > 0 ? 'text-red-500' : ''}">${d.hr}</span></div>
+                    <div class="flex flex-col"><span class="text-[10px] text-slate-500 uppercase font-bold">HR</span><span class="text-sm font-black ${d.hr > 0 ? 'text-red-500' : ''}">${d.hr}</span></div>
                 </div>
             </div>`;
         }
