@@ -8,7 +8,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MLB Gameday Monitor v3.3</title>
+    <title>MLB Gameday Monitor v3.4</title>
 
     <!-- iOS 圖示 -->
     <link rel="apple-touch-icon" href="https://teamkazu223.github.io/mlb-daily/img/mlb.png">
@@ -184,7 +184,7 @@
         <p class="loader-text">SYNCING MLB DATA...</p>
     </div>
 
-    <div class="version-tag">v3.3</div>
+    <div class="version-tag">v3.4</div>
 
     <header>
         <div class="flex justify-center mb-4">
@@ -483,9 +483,6 @@
             btnN.className = lId==='104' ? 'flex-1 py-1.5 rounded-lg bg-blue-600/20 text-blue-400 text-[10px] font-black border border-blue-500/30' : 'flex-1 py-1.5 rounded-lg bg-slate-800 text-slate-500 text-[10px] font-black';
             const leagueName = lId === '103' ? '美國聯盟' : '國家聯盟';
             
-            // v3.3: 修正分區名稱判定邏輯，使用 Division ID 進行精確排序與命名
-            // AL: 東區(201), 中區(202), 西區(200)
-            // NL: 東區(204), 中區(205), 西區(203)
             const recs = standingsData.filter(r => r.league.id == lId).map(r => {
                 const dId = r.division?.id;
                 let dTitle = "";
@@ -600,6 +597,14 @@
                 <div class="season-stat-grid text-slate-300">${row}</div>
             </div>`;
         }
+
+        // --- 核心函數掛載點 ---
+        window.handleDateChange = fetchDailyData;
+        window.handleManualRefresh = () => { 
+            if (currentTab === 'daily') fetchDailyData(); 
+            else if (currentTab === 'season') fetchSeasonData();
+            else fetchStartersData();
+        };
 
         window.onload = init;
     </script>
