@@ -8,7 +8,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MLB Gameday Monitor v3.0</title>
+    <title>MLB Gameday Monitor v3.1</title>
 
     <!-- iOS 圖示 -->
     <link rel="apple-touch-icon" href="https://teamkazu223.github.io/mlb-daily/img/mlb.png">
@@ -22,7 +22,7 @@
     <style>
         :root {
             --bg-color: #0a1118;
-            --tab-height: 65px;
+            --tab-height: 56px; /* v3.1: 縮小頁籤高度 */
             --safe-bottom: env(safe-area-inset-bottom);
             --safe-top: env(safe-area-inset-top);
             --mlb-blue: #3b82f6;
@@ -50,7 +50,7 @@
         /* 版本號標記 */
         .version-tag {
             position: absolute;
-            top: calc(10px + var(--safe-top));
+            top: calc(8px + var(--safe-top));
             left: 15px;
             font-size: 10px;
             font-weight: 900;
@@ -59,11 +59,11 @@
             pointer-events: none;
         }
 
-        /* 頂部 Header */
+        /* 頂部 Header：壓縮高度 */
         header {
             background: linear-gradient(180deg, #141f2a 0%, #0a1118 100%);
-            padding-top: calc(1.5rem + var(--safe-top));
-            padding-bottom: 1.5rem;
+            padding-top: calc(0.75rem + var(--safe-top));
+            padding-bottom: 0.75rem;
             text-align: center;
             flex-shrink: 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -77,7 +77,7 @@
             padding: 0 1rem;
         }
 
-        /* 底部頁籤 */
+        /* 底部頁籤：壓縮高度並適配 Safe Area */
         .tab-bar {
             flex-shrink: 0;
             height: calc(var(--tab-height) + var(--safe-bottom));
@@ -96,19 +96,19 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 2px;
             color: #64748b;
             background: none;
             border: none;
             width: 33.33%;
         }
         .tab-item.active { color: var(--mlb-blue); }
-        .tab-item i { font-size: 18px; }
-        .tab-item span { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; }
+        .tab-item i { font-size: 16px; }
+        .tab-item span { font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
 
         .card-dark { background-color: #1a2634; border: 1px solid #2d3d4d; border-radius: 1.25rem; padding: 1.25rem; margin-bottom: 1rem; }
         
-        /* 選手圖片包裝器 (Silo 透明風格 + 藍框) */
+        /* 選手圖片包裝器 (Silo 風格) */
         .player-img-wrapper {
             position: relative;
             border-radius: 50%;
@@ -132,7 +132,7 @@
         .season-stat-grid { display: grid; grid-template-columns: repeat(5, 1fr); text-align: center; padding-top: 10px; border-top: 1px solid #2d3d4d; margin-top: 10px; }
         
         .schedule-row {
-            display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 12px;
             background: rgba(26, 38, 52, 0.7); border: 1px solid #2d3d4d; margin-bottom: 8px;
         }
 
@@ -140,34 +140,34 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: #0a1118; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000;
         }
-        .baseball-spinner { width: 50px; height: 50px; background-color: var(--mlb-blue); border-radius: 50%; position: relative; animation: spin 2s linear infinite; }
-        .baseball-spinner::before, .baseball-spinner::after { content: ''; position: absolute; width: 40px; height: 40px; border: 3.5px solid #0a1118; border-radius: 50%; }
-        .baseball-spinner::before { top: -24px; left: 5px; }
-        .baseball-spinner::after { bottom: -24px; right: -10px; }
+        .baseball-spinner { width: 44px; height: 44px; background-color: var(--mlb-blue); border-radius: 50%; position: relative; animation: spin 2s linear infinite; }
+        .baseball-spinner::before, .baseball-spinner::after { content: ''; position: absolute; width: 34px; height: 34px; border: 3px solid #0a1118; border-radius: 50%; }
+        .baseball-spinner::before { top: -20px; left: 4px; }
+        .baseball-spinner::after { bottom: -20px; right: -8px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loader-text { color: #81b3ff; font-weight: 900; font-size: 13px; letter-spacing: 0.25em; margin-top: 20px; }
+        .loader-text { color: #81b3ff; font-weight: 900; font-size: 11px; letter-spacing: 0.2em; margin-top: 16px; }
 
         /* 分區排名表格樣式 */
         .division-header { 
             background: rgba(255, 255, 255, 0.03); 
             color: #ffffff; 
             font-weight: 900; 
-            padding: 14px; 
+            padding: 12px 14px; 
             border-radius: 8px 8px 0 0; 
-            margin: 20px 0 0 0; 
-            font-size: 13px; 
+            margin: 16px 0 0 0; 
+            font-size: 12px; 
             border-bottom: 1px solid #2d3d4d;
         }
         .standing-table { width: 100%; border-collapse: collapse; font-size: 10px; background: rgba(26, 38, 52, 0.2); }
         .standing-table thead th { 
             text-align: right; 
-            padding: 10px 4px; 
+            padding: 8px 4px; 
             color: #64748b; 
             font-weight: 900; 
             border-bottom: 1px solid #2d3d4d;
         }
         .standing-table thead th:first-child, .standing-table tbody td:first-child { text-align: left; padding-left: 12px; }
-        .standing-table tbody td { padding: 14px 4px; border-bottom: 1px solid #1e293b; text-align: right; color: #cbd5e1; }
+        .standing-table tbody td { padding: 12px 4px; border-bottom: 1px solid #1e293b; text-align: right; color: #cbd5e1; }
         .standing-table tbody td:first-child { text-align: left; }
         .standing-table .team-name { font-weight: 700; color: #ffffff; }
         .standing-table .team-name.highlight { color: var(--mlb-blue); }
@@ -180,40 +180,40 @@
 
     <div id="loader-overlay">
         <div class="baseball-spinner"></div>
-        <p class="loader-text">SYNCHRONIZING DATA...</p>
+        <p class="loader-text">SYNCING MLB DATA...</p>
     </div>
 
-    <div class="version-tag">v3.0</div>
+    <div class="version-tag">v3.1</div>
 
     <header>
-        <div class="flex justify-center mb-6">
-            <img src="https://www.mlbstatic.com/team-logos/league-on-dark/1.svg" class="h-10" alt="MLB">
+        <div class="flex justify-center mb-4">
+            <img src="https://www.mlbstatic.com/team-logos/league-on-dark/1.svg" class="h-8" alt="MLB">
         </div>
         <div id="header-controls" class="px-4">
             <div class="flex gap-2">
-                <input type="date" id="target-date" class="flex-1 bg-[#1a2634] border border-white/10 rounded-2xl p-4 text-white font-bold outline-none" onchange="handleDateChange()">
-                <button onclick="handleManualRefresh()" class="w-16 bg-[#1a2634] border border-white/10 rounded-2xl flex items-center justify-center active:scale-90">
-                    <i class="fas fa-sync-alt text-lg text-blue-400"></i>
+                <input type="date" id="target-date" class="flex-1 bg-[#1a2634] border border-white/10 rounded-2xl p-3.5 text-white text-sm font-bold outline-none" onchange="handleDateChange()">
+                <button onclick="handleManualRefresh()" class="w-14 bg-[#1a2634] border border-white/10 rounded-2xl flex items-center justify-center active:scale-90">
+                    <i class="fas fa-sync-alt text-base text-blue-400"></i>
                 </button>
             </div>
         </div>
-        <div id="header-season-title" class="hidden py-2 text-blue-400 font-black uppercase tracking-tighter">Season Stats 2026</div>
-        <div id="header-starter-title" class="hidden py-2 text-emerald-400 font-black uppercase tracking-tighter">Probable Starters</div>
+        <div id="header-season-title" class="hidden py-1.5 text-blue-400 font-black uppercase text-sm tracking-tighter">Season Stats 2026</div>
+        <div id="header-starter-title" class="hidden py-1.5 text-emerald-400 font-black uppercase text-sm tracking-tighter">Probable Starters</div>
     </header>
 
     <main id="scroll-area">
         <!-- 頁籤 1: 今日戰況 -->
         <div id="tab-content-daily">
-            <section class="mt-6 mb-8">
-                <h2 class="font-black text-sm tracking-widest uppercase mb-4 text-slate-400">Schedule 重點賽程</h2>
+            <section class="mt-4 mb-8">
+                <h2 class="font-black text-[11px] tracking-widest uppercase mb-3 text-slate-500">Schedule 重點賽程</h2>
                 <div id="schedule-list" class="space-y-2"></div>
             </section>
             <section class="mb-8">
-                <h2 class="font-black text-sm tracking-widest uppercase mb-4 text-slate-400">Batters 打者成績</h2>
+                <h2 class="font-black text-[11px] tracking-widest uppercase mb-3 text-slate-500">Batters 打者成績</h2>
                 <div id="batter-list" class="space-y-4"></div>
             </section>
             <section class="mb-8">
-                <h2 class="font-black text-sm tracking-widest uppercase mb-4 text-slate-400">Pitchers 投手成績</h2>
+                <h2 class="font-black text-[11px] tracking-widest uppercase mb-3 text-slate-500">Pitchers 投手成績</h2>
                 <div id="pitcher-list" class="space-y-4"></div>
             </section>
             <div class="bottom-spacer"></div>
@@ -221,16 +221,16 @@
 
         <!-- 頁籤 2: 賽季累積 -->
         <div id="tab-content-season" class="hidden">
-            <section class="mt-6 mb-8">
-                <h2 class="font-black text-sm tracking-widest uppercase mb-4 text-blue-400">Accumulated 賽季累積</h2>
+            <section class="mt-4 mb-8">
+                <h2 class="font-black text-[11px] tracking-widest uppercase mb-3 text-blue-400">Accumulated 賽季累積</h2>
                 <div id="season-stats-list" class="space-y-4"></div>
             </section>
             <section class="mb-8">
-                <h2 class="font-black text-sm tracking-widest uppercase mb-4 text-slate-400">Standings 分區排名</h2>
+                <h2 class="font-black text-[11px] tracking-widest uppercase mb-3 text-slate-500">Standings 分區排名</h2>
                 <div class="card-dark overflow-hidden p-0 bg-transparent border-none">
-                    <div class="flex gap-2 mb-4 px-1">
-                        <button onclick="renderLeagueStandings('103')" id="btn-al" class="flex-1 py-2 rounded-xl bg-slate-800 text-slate-500 text-[10px] font-black tracking-widest">美國聯盟</button>
-                        <button onclick="renderLeagueStandings('104')" id="btn-nl" class="flex-1 py-2 rounded-xl bg-blue-600/20 text-blue-400 text-[10px] font-black border border-blue-500/30">國家聯盟</button>
+                    <div class="flex gap-2 mb-3 px-1">
+                        <button onclick="renderLeagueStandings('103')" id="btn-al" class="flex-1 py-1.5 rounded-lg bg-slate-800 text-slate-500 text-[10px] font-black tracking-widest">美國聯盟</button>
+                        <button onclick="renderLeagueStandings('104')" id="btn-nl" class="flex-1 py-1.5 rounded-lg bg-blue-600/20 text-blue-400 text-[10px] font-black border border-blue-500/30">國家聯盟</button>
                     </div>
                     <div id="standings-container"></div>
                 </div>
@@ -240,8 +240,8 @@
 
         <!-- 頁籤 3: 先發預告 -->
         <div id="tab-content-starters" class="hidden">
-            <section class="mt-6 mb-8">
-                <h2 class="font-black text-sm tracking-widest uppercase mb-4 text-emerald-400">Upcoming 先發預告 (未來5日)</h2>
+            <section class="mt-4 mb-8">
+                <h2 class="font-black text-[11px] tracking-widest uppercase mb-3 text-emerald-400">Upcoming 先發預告</h2>
                 <div id="starters-list" class="space-y-4"></div>
             </section>
             <div class="bottom-spacer"></div>
@@ -273,7 +273,7 @@
             ],
             pitchers: [
                 { id: 660271, name: '大谷翔平', teamHint: 119, img: 'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:silo:current.png/r_max/w_180,q_auto:best/v1/people/660271/headshot/silo/current' },
-                { id: 808967, name: '山本由伸', teamHint: 119, img: 'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:silo:current.png/r_max/w_180,q_auto:best/v1/people/808967/headshot/silo/current' },
+                { id: 808967, name: '山本由伸', teamHint: 119, img: 'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:silo:current.png/r_max/w_180,q_auto:best/v1/people/660271/headshot/silo/current' },
                 { id: 678906, name: '鄧愷威', teamHint: 117, img: 'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:silo:current.png/r_max/w_180,q_auto:best/v1/people/678906/headshot/silo/current' }
             ]
         };
@@ -350,7 +350,7 @@
                         const dateStr = new Date(dateObj.date).toLocaleDateString('zh-TW', { month: 'short', day: 'numeric', weekday: 'short' });
                         const games = dateObj.games.filter(g => SCHEDULE_FILTER_TEAMS.includes(g.teams.away.team.id) || SCHEDULE_FILTER_TEAMS.includes(g.teams.home.team.id));
                         if (games.length > 0) {
-                            html += `<div class="mb-4"><h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 pl-1">${dateStr}</h3>`;
+                            html += `<div class="mb-4"><h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 pl-1">${dateStr}</h3>`;
                             games.forEach(g => { html += renderStarterGameCard(g); });
                             html += `</div>`;
                         }
@@ -374,38 +374,31 @@
                 const pId = p ? p.id : null;
                 const pImg = pId ? `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:silo:current.png/r_max/w_180,q_auto:best/v1/people/${pId}/headshot/silo/current` : 'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:silo:current.png/r_max/w_180,q_auto:best/v1/people/generic/headshot/silo/current';
                 return `
-                    <div class="flex flex-col items-center gap-3 w-[45%]">
-                        <div class="player-img-wrapper" style="width: 80px; height: 80px;">
+                    <div class="flex flex-col items-center gap-2 w-[45%]">
+                        <div class="player-img-wrapper" style="width: 72px; height: 72px;">
                             <img src="${pImg}">
                         </div>
                         <div class="text-center">
-                            <p class="text-[11px] font-black text-blue-400 uppercase mb-0.5 tracking-tight">${TEAM_MAP[team.team.id] || team.team.name}</p>
-                            <p class="text-xs font-black leading-tight truncate w-24">${pName}</p>
+                            <p class="text-[10px] font-black text-blue-400 uppercase mb-0.5 tracking-tight">${TEAM_MAP[team.team.id] || team.team.name}</p>
+                            <p class="text-[11px] font-black leading-tight truncate w-24">${pName}</p>
                         </div>
                     </div>
                 `;
             };
             return `
-                <div class="card-dark py-5 px-3">
-                    <div class="flex justify-between items-center mb-6 px-2">
-                        <span class="text-[10px] font-black text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/20">${time} ET</span>
-                        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">${g.venue.name}</span>
+                <div class="card-dark py-4 px-3">
+                    <div class="flex justify-between items-center mb-4 px-1">
+                        <span class="text-[9px] font-black text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/20">${time} ET</span>
+                        <span class="text-[8px] font-bold text-slate-500 uppercase tracking-tighter truncate max-w-[120px]">${g.venue.name}</span>
                     </div>
                     <div class="flex items-start justify-between">
                         ${renderPitcherInfo(away)}
-                        <div class="pt-6 text-slate-700 font-black text-sm">VS</div>
+                        <div class="pt-5 text-slate-700 font-black text-xs">VS</div>
                         ${renderPitcherInfo(home)}
                     </div>
                 </div>
             `;
         }
-
-        window.handleDateChange = fetchDailyData;
-        window.handleManualRefresh = () => { 
-            if (currentTab === 'daily') fetchDailyData(); 
-            else if (currentTab === 'season') fetchSeasonData();
-            else fetchStartersData();
-        };
 
         async function fetchSchedule(date) {
             try {
@@ -424,12 +417,12 @@
                     if (status === 'Live' && g.linescore) sub = `<span class="text-red-500 font-bold">${g.linescore.inningState || ""} ${g.linescore.currentInningOrdinal || ""}</span>`;
                     return `<div class="schedule-row">
                         <div class="text-[9px] font-black w-10"><div class="text-slate-400">${time}</div><div>${sub}</div></div>
-                        <div class="flex-1 flex items-center justify-center gap-2 px-2 overflow-hidden">
-                            <div class="flex items-center gap-1.5 flex-1 justify-end min-w-0"><span class="text-[10px] font-bold truncate">${TEAM_MAP[g.teams.away.team.id] || '---'}</span><img src="https://www.mlbstatic.com/team-logos/${g.teams.away.team.id}.svg" class="w-4 h-4"><span class="font-black text-sm">${g.teams.away.score ?? 0}</span></div>
+                        <div class="flex-1 flex items-center justify-center gap-2 px-1 overflow-hidden">
+                            <div class="flex items-center gap-1 flex-1 justify-end min-w-0"><span class="text-[9px] font-bold truncate">${TEAM_MAP[g.teams.away.team.id] || '---'}</span><img src="https://www.mlbstatic.com/team-logos/${g.teams.away.team.id}.svg" class="w-4 h-4"><span class="font-black text-sm">${g.teams.away.score ?? 0}</span></div>
                             <span class="text-[8px] text-slate-600 flex-shrink-0">vs</span>
-                            <div class="flex items-center gap-1.5 flex-1 justify-start min-w-0"><span class="font-black text-sm">${g.teams.home.score ?? 0}</span><img src="https://www.mlbstatic.com/team-logos/${g.teams.home.team.id}.svg" class="w-4 h-4"><span class="text-[10px] font-bold truncate">${TEAM_MAP[g.teams.home.team.id] || '---'}</span></div>
+                            <div class="flex items-center gap-1 flex-1 justify-start min-w-0"><span class="font-black text-sm">${g.teams.home.score ?? 0}</span><img src="https://www.mlbstatic.com/team-logos/${g.teams.home.team.id}.svg" class="w-4 h-4"><span class="text-[9px] font-bold truncate">${TEAM_MAP[g.teams.home.team.id] || '---'}</span></div>
                         </div>
-                        <a href="https://www.mlb.com/gameday/${g.gamePk}" target="_blank" class="w-8 h-8 flex items-center justify-center bg-blue-500/10 rounded-lg text-blue-400 active:scale-95 flex-shrink-0">
+                        <a href="https://www.mlb.com/gameday/${g.gamePk}" target="_blank" class="w-8 h-8 flex items-center justify-center bg-blue-500/10 rounded-lg text-blue-400 active:scale-95 flex-shrink-0 ml-1">
                             <i class="fas fa-external-link-alt text-[10px]"></i>
                         </a>
                     </div>`;
@@ -485,9 +478,11 @@
 
         window.renderLeagueStandings = (lId) => {
             const btnA = document.getElementById('btn-al'); const btnN = document.getElementById('btn-nl');
-            btnA.className = lId==='103' ? 'flex-1 py-2 rounded-xl bg-blue-600/20 text-blue-400 text-[10px] font-black border border-blue-500/30' : 'flex-1 py-2 rounded-xl bg-slate-800 text-slate-500 text-[10px] font-black';
-            btnN.className = lId==='104' ? 'flex-1 py-2 rounded-xl bg-blue-600/20 text-blue-400 text-[10px] font-black border border-blue-500/30' : 'flex-1 py-2 rounded-xl bg-slate-800 text-slate-500 text-[10px] font-black';
+            btnA.className = lId==='103' ? 'flex-1 py-1.5 rounded-lg bg-blue-600/20 text-blue-400 text-[10px] font-black border border-blue-500/30' : 'flex-1 py-1.5 rounded-lg bg-slate-800 text-slate-500 text-[10px] font-black';
+            btnN.className = lId==='104' ? 'flex-1 py-1.5 rounded-lg bg-blue-600/20 text-blue-400 text-[10px] font-black border border-blue-500/30' : 'flex-1 py-1.5 rounded-lg bg-slate-800 text-slate-500 text-[10px] font-black';
             const leagueName = lId === '103' ? '美國聯盟' : '國家聯盟';
+            
+            // v3.1: 修正排序，強制 東區 -> 中區 -> 西區
             const recs = standingsData.filter(r => r.league.id == lId).map(r => {
                 let n = r.division?.name || ""; let o = 99;
                 if (n.includes('East')){ n=`${leagueName}東區`; o=1; } 
@@ -495,6 +490,7 @@
                 else { n=`${leagueName}西區`; o=3; }
                 return {...r, n, o};
             }).sort((a,b)=>a.o-b.o);
+
             document.getElementById('standings-container').innerHTML = recs.map(div => `
                 <div class="division-header">${div.n}</div>
                 <table class="standing-table">
@@ -589,9 +585,9 @@
                 <div><span class="text-[8px] text-slate-500 block">SV</span><span class="text-sm font-black">${s?.saves||0}</span></div>
             `;
             return `<div class="card-dark">
-                <div class="flex items-center gap-5 mb-3">
-                    <div class="player-img-wrapper" style="width: 80px; height: 80px;"><img src="${p.img}"></div>
-                    <div><h3 class="font-black text-base">${p.name}</h3><p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">SEASON ACCUMULATED</p></div>
+                <div class="flex items-center gap-4 mb-2">
+                    <div class="player-img-wrapper" style="width: 72px; height: 72px;"><img src="${p.img}"></div>
+                    <div><h3 class="font-black text-sm">${p.name}</h3><p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">SEASON ACCUMULATED</p></div>
                 </div>
                 <div class="season-stat-grid text-slate-300">${row}</div>
             </div>`;
