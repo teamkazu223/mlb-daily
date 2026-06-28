@@ -8,7 +8,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MLB Gameday Monitor v3.5</title>
+    <title>MLB Gameday Monitor v3.8</title>
 
     <!-- iOS 圖示 -->
     <link rel="apple-touch-icon" href="https://teamkazu223.github.io/mlb-daily/img/mlb.png">
@@ -129,7 +129,7 @@
             object-position: center center;
         }
 
-        .stat-grid { display: grid; grid-template-columns: repeat(6, 1fr); text-align: center; padding-top: 10px; border-top: 1px solid #2d3d4d; margin-top: 10px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; padding-top: 10px; border-top: 1px solid #2d3d4d; margin-top: 10px; }
         .season-stat-grid { display: grid; grid-template-columns: repeat(5, 1fr); text-align: center; padding-top: 10px; border-top: 1px solid #2d3d4d; margin-top: 10px; }
         
         .schedule-row {
@@ -184,7 +184,7 @@
         <p class="loader-text">SYNCING MLB DATA...</p>
     </div>
 
-    <div class="version-tag">v3.5</div>
+    <div class="version-tag">v3.8</div>
 
     <header>
         <div class="flex justify-center mb-3">
@@ -192,7 +192,7 @@
         </div>
         
         <div id="header-controls" class="px-4">
-            <!-- v3.5: 美東與台灣即時時間顯示 -->
+            <!-- 美東與台灣即時時間顯示 -->
             <div class="flex justify-between items-center mb-2.5 text-[9px] font-black tracking-wider text-slate-400">
                 <div class="flex items-center gap-1.5 bg-[#141f2a] px-2.5 py-1 rounded-full border border-white/5">
                     <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
@@ -278,12 +278,13 @@
     </nav>
 
     <script>
-        const SCHEDULE_FILTER_TEAMS = [119, 117, 116];
-        const PRIORITY_TEAMS = [119, 117, 116, 137]; 
+        const SCHEDULE_FILTER_TEAMS = [119, 117, 116, 111]; 
+        const PRIORITY_TEAMS = [119, 117, 116, 137, 111]; 
         const PLAYERS = {
             batters: [
                 { id: 660271, name: '大谷翔平', teamHint: 119, pos: 'DH', img: 'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:silo:current.png/r_max/w_180,q_auto:best/v1/people/660271/headshot/silo/current' },
-                { id: 701678, name: '李灝宇', teamHint: 116, pos: '2B', img: 'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:silo:current.png/r_max/w_180,q_auto:best/v1/people/701678/headshot/silo/current' }
+                { id: 701678, name: '李灝宇', teamHint: 116, pos: '2B', img: 'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:silo:current.png/r_max/w_180,q_auto:best/v1/people/701678/headshot/silo/current' },
+                { id: 691907, name: '鄭宗哲', teamHint: 111, pos: 'SS', img: 'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:silo:current.png/r_max/w_180,q_auto:best/v1/people/691907/headshot/silo/current' }
             ],
             pitchers: [
                 { id: 660271, name: '大谷翔平', teamHint: 119, img: 'https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:silo:current.png/r_max/w_180,q_auto:best/v1/people/660271/headshot/silo/current' },
@@ -292,23 +293,20 @@
             ]
         };
         const TEAM_MAP = { 
-            108: '天使', 109: '響尾蛇', 110: '金鶯', 111: '紅襪', 112: '小熊', 113: '紅人', 114: '守護者', 115: '落磯', 116: '老虎', 117: '太空人', 118: '皇家', 119: '道奇', 120: '國民', 121: '大都會', 133: '運動家', 134: '海盜', 135: '教士', 136: '水手', 137: '巨人', 138: '紅雀', 139: '光芒', 140: '遊騎兵', 141: '藍鳥', 142: '雙城', 143: '費城人', 144: '勇士', 145: '白襪', 146: '馬林魚', 147: '洋基', 158: '釀酒人' 
+            108: '天使', 109: '響尾蛇', 110: '金鶯', 111: '紅襪', 112: '小熊', 113: '紅人', 114: '守護者', 115: '落磯', 116: '老虎', 117: '太空人', 118: '皇家', 119: '道奇', 120: '國民', 121: '大都會', 133: '運動家', 134: '海盜', 135: '教士', 136: '水手', 137: '巨人', 138: '紅雀', 139: '光芒', 140: '遊氣邊', 141: '藍鳥', 142: '雙城', 143: '費城人', 144: '勇士', 145: '白襪', 146: '馬林魚', 147: '洋基', 158: '釀酒人' 
         };
 
         let dailyGames = []; let currentTab = 'daily'; let seasonDataLoaded = false; let startersDataLoaded = false; let standingsData = null;
 
         function init() {
-            // v3.5: 預設日期改為美國美東時間 (ET) 的當天日期
             const usToday = getTZDateString('America/New_York');
             document.getElementById('target-date').value = usToday;
             fetchDailyData();
 
-            // 啟動動態時鐘
             updateClocks();
             setInterval(updateClocks, 1000);
         }
 
-        // 取得特定時區的 YYYY-MM-DD 字串
         function getTZDateString(timeZone) {
             try {
                 const formatter = new Intl.DateTimeFormat('sv-SE', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -319,10 +317,8 @@
             }
         }
 
-        // v3.5: 即時更新美東與台灣時鐘
         function updateClocks() {
             const now = new Date();
-            
             try {
                 const usStr = new Intl.DateTimeFormat('zh-TW', {
                     timeZone: 'America/New_York',
@@ -499,7 +495,6 @@
             document.getElementById('pitcher-list').innerHTML = pHtml;
         }
 
-        // v3.5: 升級出賽狀態判定
         async function findStats(id, type) {
             let combined = null; 
             let played = false;
@@ -511,15 +506,12 @@
                         const teamData = data.teams[s];
                         const p = teamData.players[`ID${id}`];
                         
-                        // 100% 精準檢索：直接讀取官方 batters/pitchers 實際出場名單
                         const isListedInLineup = type === 'batting' 
                             ? (teamData.batters && teamData.batters.includes(id))
                             : (teamData.pitchers && teamData.pitchers.includes(id));
                         
                         if (p?.stats?.[type]) {
                             const st = p.stats[type];
-                            
-                            // 如果在官方名單內，或有打數、打席等，則必定是已上場
                             let active = isListedInLineup;
                             if (!active) {
                                 active = type === 'batting' 
@@ -638,7 +630,8 @@
                     <div><span class="text-[8px] text-slate-500 block">H</span><span class="text-sm font-black ${s?.hits>0?'text-blue-400':''}">${s?.hits||0}</span></div>
                     <div><span class="text-[8px] text-slate-500 block">RBI</span><span class="text-sm font-black">${s?.rbi||0}</span></div>
                     <div><span class="text-[8px] text-slate-500 block">BB</span><span class="text-sm font-black">${s?.baseOnBalls||0}</span></div>
-                    <div><span class="text-[8px] text-slate-500 block">HR</span><span class="text-sm font-black ${s?.homeRuns>0?'text-red-500':''}">${s?.homeRuns||0}</span></div>
+                    <div><span class="text-[8px] text-red-400 block">K</span><span class="text-sm font-black text-red-400">${s?.strikeOuts||s?.strikeouts||0}</span></div>
+                    <div><span class="text-[8px] text-purple-400 block">HR</span><span class="text-sm font-black text-purple-400">${s?.homeRuns||0}</span></div>
                 </div>
             </div>`;
         }
@@ -657,6 +650,7 @@
                     <div><span class="text-[8px] text-slate-500 block">H</span><span class="text-sm font-black">${s?.hits||0}</span></div>
                     <div><span class="text-[8px] text-slate-500 block">ER</span><span class="text-sm font-black">${s?.earnedRuns||0}</span></div>
                     <div><span class="text-[8px] text-slate-500 block">BB</span><span class="text-sm font-black">${s?.baseOnBalls||0}</span></div>
+                    <div><span class="text-[8px] text-orange-400 block">HR</span><span class="text-sm font-black text-orange-400">${s?.homeRuns||0}</span></div>
                     <div><span class="text-[8px] text-purple-400 block">K</span><span class="text-sm font-black text-purple-400">${s?.strikeOuts||s?.strikeouts||0}</span></div>
                     <div><span class="text-[8px] text-slate-500 block">NP</span><span class="text-sm font-black">${s?.numberOfPitches||0}</span></div>
                 </div>
@@ -686,7 +680,7 @@
             </div>`;
         }
 
-        // --- 全域函數綁定 (防止與全域範圍隔離錯誤) ---
+        // --- 全域函數綁定 ---
         window.handleDateChange = fetchDailyData;
         window.handleManualRefresh = () => { 
             if (currentTab === 'daily') fetchDailyData(); 
